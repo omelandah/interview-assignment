@@ -21,12 +21,10 @@ export class Student
 
   // association fields
   public teachers?: Teacher[];
-  public suspendedByTeachers?: Teacher[];
 
   // Sequelize metadata
   public static associations: {
     teachers: Association<Student, Teacher>;
-    suspendedByTeachers: Association<Student, Teacher>;
   };
 
   public static associate(models: {

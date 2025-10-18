@@ -28,11 +28,9 @@ export class Teacher
   public getStudents!: HasManyGetAssociationsMixin<Student>;
 
   public readonly students?: Student[];
-  public suspendedStudents?: Student[];
 
   public static associations: {
     students: Association<Teacher, Student>;
-    suspendedStudents: Association<Teacher, Student>;
   };
 
   public static associate(models: {
