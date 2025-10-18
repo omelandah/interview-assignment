@@ -15,6 +15,6 @@
     "noImplicitAny": true,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/config/sequelize.config.js"],
   "exclude": ["node_modules", "dist"]
 }
