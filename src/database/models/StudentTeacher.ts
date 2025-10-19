@@ -1,10 +1,21 @@
-import { Sequelize, DataTypes, Model } from 'sequelize';
+import { Sequelize, DataTypes, Model, Association } from 'sequelize';
 import { ModelDefinition } from '../types/model.d';
+import { Student } from './Student';
+import { Teacher } from './Teacher';
 
 export class StudentTeacher extends Model {
   declare id: number;
   declare studentId: string;
   declare teacherId: string;
+
+  // add association fields so TS knows about them
+  declare student?: Student;
+  declare teacher?: Teacher;
+
+  declare static associations: {
+    student: Association<StudentTeacher, Student>;
+    teacher: Association<StudentTeacher, Teacher>;
+  };
 }
 
 const StudentTeacherModel: ModelDefinition = {
