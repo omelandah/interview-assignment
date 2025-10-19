@@ -1,9 +1,6 @@
-import { Sequelize } from 'sequelize';
-import { initStudent, Student } from './models/Student';
-import { initTeacher, Teacher } from './models/Teacher';
-import { initStudentTeacher, StudentTeacher } from './models/StudentTeacher';
-
+import { Model, ModelStatic, Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
+import modelDefinitions from './models';
 
 dotenv.config();
 
@@ -13,13 +10,19 @@ export const sequelize = new Sequelize(DB_DATABASE!, DB_USER!, DB_PASSWORD!, {
   host: DB_HOST,
   dialect: 'mysql',
   port: Number(DB_PORT),
+  logging: false,
 });
 
-// Initialize
-initStudent(sequelize);
-initTeacher(sequelize);
-initStudentTeacher(sequelize);
+export const models = modelDefinitions.reduce(
+  (acc, def) => {
+    const model = def.init(sequelize);
+    acc[model.name] = model;
+    return acc;
+  },
+  {} as Record<string, ModelStatic<Model>>
+);
 
-// Associations
-Student.associate({ Teacher, StudentTeacher });
-Teacher.associate({ Student, StudentTeacher });
+// Setup associations
+modelDefinitions.forEach((def) => {
+  def.associate?.(models);
+});

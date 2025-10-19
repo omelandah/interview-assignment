@@ -16,7 +16,7 @@ const registerStudents = async (req: Request, res: Response) => {
     return res.sendStatus(204);
   } catch (err: unknown) {
     if (err instanceof Error) {
-      console.log('Error in registerStudents: ', err.message);
+      console.log('Error in registerStudents: ', err);
       if (err.message.includes('not found')) {
         return res.status(404).json({ error: err.message });
       }

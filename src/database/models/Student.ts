@@ -1,36 +1,40 @@
-import { DataTypes, Model, Sequelize, Optional, Association } from 'sequelize';
-import { Teacher } from './Teacher';
-import { StudentTeacher } from './StudentTeacher';
+import { Sequelize, DataTypes, Model } from 'sequelize';
+import { ModelDefinition } from '../types/model.d';
 
-export interface StudentAttributes {
-  id: string;
-  email: string;
-  isSuspended?: boolean;
+export class Student extends Model {
+  declare id: string;
+  declare email: string;
 }
 
-export interface StudentCreationAttributes
-  extends Optional<StudentAttributes, 'id'> {}
+const StudentModel: ModelDefinition = {
+  init: (sequelize: Sequelize) => {
+    Student.init(
+      {
+        id: {
+          type: DataTypes.UUID,
+          defaultValue: DataTypes.UUIDV4,
+          allowNull: false,
+          primaryKey: true,
+          field: 'uuid',
+        },
+        email: {
+          type: DataTypes.STRING(56),
+          allowNull: false,
+          field: 'email',
+        },
+      },
+      {
+        sequelize,
+        freezeTableName: true,
+        modelName: 'Student',
+        tableName: 't_students',
+      }
+    );
 
-export class Student
-  extends Model<StudentAttributes, StudentCreationAttributes>
-  implements StudentAttributes
-{
-  public id!: string;
-  public email!: string;
-  public isSuspended?: boolean;
+    return Student;
+  },
 
-  // association fields
-  public teachers?: Teacher[];
-
-  // Sequelize metadata
-  public static associations: {
-    teachers: Association<Student, Teacher>;
-  };
-
-  public static associate(models: {
-    Teacher: typeof Teacher;
-    StudentTeacher: typeof StudentTeacher;
-  }) {
+  associate: (models) => {
     Student.belongsToMany(models.Teacher, {
       through: models.StudentTeacher,
       foreignKey: 'studentUuid',
@@ -38,37 +42,6 @@ export class Student
       as: 'teachers',
       onDelete: 'CASCADE',
     });
-  }
-}
-
-export function initStudent(sequelize: Sequelize): typeof Student {
-  Student.init(
-    {
-      id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        allowNull: false,
-        primaryKey: true,
-        field: 'uuid',
-      },
-      email: {
-        type: DataTypes.STRING(56),
-        allowNull: false,
-        field: 'email',
-      },
-      isSuspended: {
-        type: DataTypes.BOOLEAN,
-        allowNull: true,
-        field: 'is_suspended',
-      },
-    },
-    {
-      sequelize,
-      freezeTableName: true,
-      modelName: 'Student',
-      tableName: 't_students',
-    }
-  );
-
-  return Student;
-}
+  },
+};
+export default StudentModel;

@@ -23,7 +23,7 @@ async function main() {
   }
 
   const [rows] = await connection.execute<TimeRow[]>('SELECT NOW() AS now');
-  console.log('⏰ Time:', rows[0].now);
+  console.log('Connected to db - ⏰ Time:', rows[0].now);
 
   await connection.end();
 }

@@ -1,5 +1,5 @@
-import { Student } from './Student';
-import { Teacher } from './Teacher';
-import { StudentTeacher } from './StudentTeacher';
+import StudentModel from './Student';
+import TeacherModel from './Teacher';
+import StudentTeacherModel from './StudentTeacher';
 
-export default [Student, Teacher, StudentTeacher];
+export default [StudentModel, TeacherModel, StudentTeacherModel];
