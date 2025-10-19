@@ -2,6 +2,7 @@ import { Sequelize, DataTypes, Model } from 'sequelize';
 import { ModelDefinition } from '../types/model.d';
 
 export class StudentTeacher extends Model {
+  declare id: number;
   declare studentId: string;
   declare teacherId: string;
   declare isSuspended?: boolean;
@@ -49,6 +50,12 @@ const StudentTeacherModel: ModelDefinition = {
         freezeTableName: true,
         modelName: 'StudentTeacher',
         tableName: 't_student_teacher',
+        indexes: [
+          {
+            unique: true,
+            fields: ['student_uuid', 'teacher_uuid'],
+          },
+        ],
       }
     );
 
