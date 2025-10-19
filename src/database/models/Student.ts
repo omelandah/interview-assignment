@@ -1,9 +1,27 @@
-import { Sequelize, DataTypes, Model } from 'sequelize';
+import { Sequelize, DataTypes, Model, Optional, Association } from 'sequelize';
 import { ModelDefinition } from '../types/model.d';
+import { Teacher } from './Teacher';
 
-export class Student extends Model {
+interface StudentAttributes {
+  id: string;
+  email: string;
+}
+
+interface StudentCreationAttributes extends Optional<StudentAttributes, 'id'> {}
+
+export class Student
+  extends Model<StudentAttributes, StudentCreationAttributes>
+  implements StudentAttributes
+{
   declare id: string;
   declare email: string;
+
+  // Association property:
+  declare teachers?: Teacher[];
+
+  declare static associations: {
+    teachers: Association<Student, Teacher>;
+  };
 }
 
 const StudentModel: ModelDefinition = {

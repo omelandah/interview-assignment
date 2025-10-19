@@ -1,4 +1,4 @@
-import { Model, ModelStatic, Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 import modelDefinitions from './models';
 
@@ -13,16 +13,12 @@ export const sequelize = new Sequelize(DB_DATABASE!, DB_USER!, DB_PASSWORD!, {
   logging: false,
 });
 
-export const models = modelDefinitions.reduce(
-  (acc, def) => {
-    const model = def.init(sequelize);
-    acc[model.name] = model;
-    return acc;
-  },
-  {} as Record<string, ModelStatic<Model>>
-);
+// Initialize models
+modelDefinitions.forEach((definition) => {
+  definition.init(sequelize);
+});
 
 // Setup associations
-modelDefinitions.forEach((def) => {
-  def.associate?.(models);
+modelDefinitions.forEach((definition) => {
+  definition.associate?.(sequelize.models);
 });

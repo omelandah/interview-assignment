@@ -4,16 +4,36 @@ import {
   Model,
   BelongsToManyAddAssociationsMixin,
   BelongsToManyGetAssociationsMixin,
+  Optional,
+  Association,
 } from 'sequelize';
 import { ModelDefinition } from '../types/model.d';
 import { Student } from './Student';
 
-export class Teacher extends Model {
+interface TeacherAttributes {
+  id: string;
+  email: string;
+}
+
+interface TeacherCreationAttributes extends Optional<TeacherAttributes, 'id'> {}
+
+export class Teacher
+  extends Model<TeacherAttributes, TeacherCreationAttributes>
+  implements TeacherAttributes
+{
   declare id: string;
   declare email: string;
 
+  // Association property
+  declare students?: Student[];
+
+  // Optional mixins
   declare addStudents: BelongsToManyAddAssociationsMixin<Student, string>;
   declare getStudents: BelongsToManyGetAssociationsMixin<Student>;
+
+  declare static associations: {
+    students: Association<Teacher, Student>;
+  };
 }
 
 const TeacherModel: ModelDefinition = {
