@@ -5,7 +5,6 @@ export class StudentTeacher extends Model {
   declare id: number;
   declare studentId: string;
   declare teacherId: string;
-  declare isSuspended?: boolean;
 }
 
 const StudentTeacherModel: ModelDefinition = {
@@ -38,11 +37,6 @@ const StudentTeacherModel: ModelDefinition = {
           field: 'teacher_uuid',
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE',
-        },
-        isSuspended: {
-          type: DataTypes.BOOLEAN,
-          field: 'is_suspended',
-          allowNull: true,
         },
       },
       {

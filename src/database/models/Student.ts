@@ -5,6 +5,7 @@ import { Teacher } from './Teacher';
 interface StudentAttributes {
   id: string;
   email: string;
+  isSuspended: boolean;
 }
 
 interface StudentCreationAttributes extends Optional<StudentAttributes, 'id'> {}
@@ -15,6 +16,7 @@ export class Student
 {
   declare id: string;
   declare email: string;
+  declare isSuspended: boolean;
 
   // Association property:
   declare teachers?: Teacher[];
@@ -39,6 +41,12 @@ const StudentModel: ModelDefinition = {
           type: DataTypes.STRING(56),
           allowNull: false,
           field: 'email',
+        },
+        isSuspended: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+          field: 'is_suspended',
         },
       },
       {

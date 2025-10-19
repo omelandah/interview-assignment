@@ -43,13 +43,6 @@ export const up = async (queryInterface: QueryInterface) => {
       defaultValue: DataTypes.NOW,
     },
   });
-
-  // Optional: create unique constraint to avoid duplicate student-teacher pairs
-  await queryInterface.addConstraint('t_student_teacher', {
-    fields: ['student_uuid', 'teacher_uuid'],
-    type: 'unique',
-    name: 'unique_student_teacher_pair',
-  });
 };
 
 export const down = async (queryInterface: QueryInterface) => {
