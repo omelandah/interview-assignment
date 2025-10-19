@@ -8,7 +8,7 @@ const registerStudents = async (req: Request, res: Response) => {
     if (!teacher || !students || !Array.isArray(students)) {
       return res
         .status(400)
-        .json({ error: 'teacher and students are required' });
+        .json({ message: 'teacher and students are required' });
     }
 
     await registerService.registerStudentstoTeacher(teacher, students);
@@ -18,14 +18,14 @@ const registerStudents = async (req: Request, res: Response) => {
     if (err instanceof Error) {
       console.log('Error in registerStudents: ', err);
       if (err.message.includes('not found')) {
-        return res.status(404).json({ error: err.message });
+        return res.status(404).json({ message: err.message });
       }
 
-      return res.status(500).json({ error: 'Failed to register students' });
+      return res.status(500).json({ message: 'Failed to register students' });
     }
 
     console.error('Unexpected error in registerStudents:', err);
-    return res.status(500).json({ error: 'Unexpected error' });
+    return res.status(500).json({ message: 'Unexpected error' });
   }
 };
 

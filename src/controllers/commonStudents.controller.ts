@@ -18,7 +18,7 @@ const getCommonStudents = async (req: Request, res: Response) => {
 
     return res.status(200).json({ students: commonStudents });
   } catch (err: unknown) {
-    console.log('Error:', err);
+    console.log('Error in getCommonStudents:', err);
     if (err instanceof Error) {
       return res.status(500).json({ message: err.message });
     }
