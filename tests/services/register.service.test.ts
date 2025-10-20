@@ -10,6 +10,7 @@ jest.mock('../../src/repositories/student.repository');
 describe('registerStudentstoTeacher', () => {
   const mockTeacher = {
     addStudents: jest.fn(),
+    getStudents: jest.fn(),
   } as unknown as Teacher;
 
   const mockStudents: Student[] = [
@@ -47,13 +48,57 @@ describe('registerStudentstoTeacher', () => {
     ).rejects.toThrow('One or more students not found');
   });
 
-  it('should register students to teacher successfully', async () => {
+  it('should throw error if all students are already registered', async () => {
     (teacherRepository.findTeacherByEmail as jest.Mock).mockResolvedValue(
       mockTeacher
     );
     (studentRepository.findStudentByEmails as jest.Mock).mockResolvedValue(
       mockStudents
     );
+
+    // all students already registered
+    (mockTeacher.getStudents as jest.Mock).mockResolvedValue(mockStudents);
+
+    await expect(
+      registerService.registerStudentstoTeacher('teacher@test.com', [
+        'student1@test.com',
+        'student2@test.com',
+      ])
+    ).rejects.toThrow(
+      'All request students are already registered to this teacher !'
+    );
+  });
+
+  it('should only add new students if some are already registered', async () => {
+    (teacherRepository.findTeacherByEmail as jest.Mock).mockResolvedValue(
+      mockTeacher
+    );
+    (studentRepository.findStudentByEmails as jest.Mock).mockResolvedValue(
+      mockStudents
+    );
+
+    // only student1 already registered
+    (mockTeacher.getStudents as jest.Mock).mockResolvedValue([mockStudents[0]]);
+
+    const result = await registerService.registerStudentstoTeacher(
+      'teacher@test.com',
+      ['student1@test.com', 'student2@test.com']
+    );
+
+    expect(result).toBe(true);
+    expect(mockTeacher.addStudents).toHaveBeenCalledWith([mockStudents[1]]);
+  });
+
+  it('should register all students if none are already registered', async () => {
+    (teacherRepository.findTeacherByEmail as jest.Mock).mockResolvedValue(
+      mockTeacher
+    );
+    (studentRepository.findStudentByEmails as jest.Mock).mockResolvedValue(
+      mockStudents
+    );
+
+    // no students registered yet
+    (mockTeacher.getStudents as jest.Mock).mockResolvedValue([]);
 
     const result = await registerService.registerStudentstoTeacher(
       'teacher@test.com',

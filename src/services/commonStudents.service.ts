@@ -16,7 +16,9 @@ const getCommonStudents = async (teacherEmails: string[]) => {
   );
 
   let commonStudents: string[];
-  if (studentLists.length === 1) {
+  if (studentLists.length === 0) {
+    commonStudents = [];
+  } else if (studentLists.length === 1) {
     commonStudents = studentLists[0];
   } else {
     commonStudents = studentLists.reduce((acc, list) =>

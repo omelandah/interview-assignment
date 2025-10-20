@@ -17,7 +17,23 @@ const registerStudentstoTeacher = async (
     throw new Error('One or more students not found');
   }
 
-  await (teacher as Teacher).addStudents(students as Student[]);
+  const existingStudents = await (teacher as Teacher).getStudents({
+    where: { email: studentEmails },
+  });
+
+  const existingEmails = new Set(existingStudents.map((s) => s.email));
+
+  const newStudents = (students as Student[]).filter(
+    (s) => !existingEmails.has(s.email)
+  );
+
+  if (newStudents.length === 0) {
+    throw new Error(
+      'All request students are already registered to this teacher !'
+    );
+  }
+
+  await (teacher as Teacher).addStudents(newStudents as Student[]);
 
   return true;
 };
