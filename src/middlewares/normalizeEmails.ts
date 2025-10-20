@@ -9,8 +9,8 @@ export const normalizeEmails = (fields: string[]) => {
           ? value.map((v) => v.toLowerCase().trim())
           : value.toLowerCase().trim();
 
-        if (req.query[field]) req.query[field] = normalized;
-        if (req.body[field]) req.body[field] = normalized;
+        if (req.query?.[field]) req.query[field] = normalized;
+        if (req.body?.[field]) req.body[field] = normalized;
       }
     });
     next();
