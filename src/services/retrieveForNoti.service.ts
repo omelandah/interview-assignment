@@ -18,10 +18,11 @@ const getRecipients = async (teacherEmail: string, notification: string) => {
     .filter(Boolean);
 
   // Extract mentioned emails from notification
+  const normalizedNotification = notification.toLowerCase().trim();
   const mentionRegex = /@([\w.+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
   const mentionedEmails: string[] = [];
   let match;
-  while ((match = mentionRegex.exec(notification)) !== null) {
+  while ((match = mentionRegex.exec(normalizedNotification)) !== null) {
     mentionedEmails.push(match[1]);
   }
 
