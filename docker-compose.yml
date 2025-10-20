@@ -6,7 +6,6 @@ services:
       - .:/usr/src/app
     ports:
       - '3000:3000'
-    # command: sh -c "npm run migrate && npm run seed && npm run dev"
     environment:
       - NODE_ENV=development
       - DB_HOST=db

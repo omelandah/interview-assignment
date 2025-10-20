@@ -1,5 +1,4 @@
 import express from 'express';
-import { RowDataPacket } from 'mysql2/promise';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -26,12 +25,7 @@ dotenv.config();
 async function main() {
   const connection = await createDbConnection();
 
-  interface TimeRow extends RowDataPacket {
-    now: Date;
-  }
-
-  const [rows] = await connection.execute<TimeRow[]>('SELECT NOW() AS now');
-  console.log('Connected to db - ⏰ Time:', rows[0].now);
+  console.log('Connected to database successfully !');
 
   await connection.end();
 }
