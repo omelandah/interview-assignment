@@ -8,6 +8,7 @@ This project is a **Node.js + MySQL REST API** for managing teachers, students, 
 - Retrieve students eligible to receive a notification
 
 Unit tests are included using **Jest**.
+API documentation available via **Swagger**.
 
 ---
 
@@ -18,6 +19,23 @@ Unit tests are included using **Jest**.
 - **ORM:** Sequelize
 - **Testing:** Jest
 - **Containerization:** Docker, Docker Compose
+- **Documentation:** Swagger (via swagger-ui-express)
+
+---
+
+## API Documentation (Swagger)
+
+You can view and test all API endpoints directly in **Swagger UI** for the deployed application:
+
+**[https://administrative-app.onrender.com/api-docs/](https://administrative-app.onrender.com/api-docs/)**
+
+This documentation allows you to:
+
+- **Explore all endpoints interactively**
+- **Review request/response formats and status codes**
+- **Send test requests directly from your browser**
+
+_No setup is required — simply open the link above to try the live API!_
 
 ---
 
