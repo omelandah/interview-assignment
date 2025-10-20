@@ -3,9 +3,11 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import cors from 'cors';
 import compression from 'compression';
+import swaggerUi from 'swagger-ui-express';
 
 import routes from './routes';
 import { createDbConnection } from './config/database';
+import { swaggerSpec } from './config/swagger.config';
 
 const PORT = process.env.PORT || 3000;
 
@@ -19,6 +21,8 @@ app.use(cors());
 app.use(helmet());
 
 app.use('/api', routes);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 dotenv.config();
 
