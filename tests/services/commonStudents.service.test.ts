@@ -11,7 +11,7 @@ describe('commonStudentsService.getCommonStudents', () => {
   const mockFindTeachersWithStudent =
     teacherRepository.findTeachersWithStudent as jest.Mock;
 
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 
@@ -29,9 +29,7 @@ describe('commonStudentsService.getCommonStudents', () => {
       { email: 'student2@gmail.com' } as Student,
     ];
 
-    mockFindTeachersWithStudent.mockResolvedValue([
-      { students } as any, // teacher object
-    ]);
+    mockFindTeachersWithStudent.mockResolvedValue([{ students }]);
 
     const result = await commonStudentsService.getCommonStudents([
       'teacher1@gmail.com',
@@ -40,8 +38,22 @@ describe('commonStudentsService.getCommonStudents', () => {
     expect(result).toEqual(['student1@gmail.com', 'student2@gmail.com']);
   });
 
-  it('should return empty array if single teacher has no students', async () => {
-    mockFindTeachersWithStudent.mockResolvedValue([{ students: [] } as any]);
+  it('should return empty array if no teachers have students', async () => {
+    mockFindTeachersWithStudent.mockResolvedValue([
+      { students: [] },
+      { students: [] },
+    ]);
+
+    const result = await commonStudentsService.getCommonStudents([
+      'teacher1@gmail.com',
+      'teacher2@gmail.com',
+    ]);
+
+    expect(result).toEqual([]);
+  });
+
+  it('should return empty array if studentLists length is 0 (no students at all)', async () => {
+    mockFindTeachersWithStudent.mockResolvedValue([{ students: [] }]);
 
     const result = await commonStudentsService.getCommonStudents([
       'teacher1@gmail.com',
@@ -55,15 +67,14 @@ describe('commonStudentsService.getCommonStudents', () => {
       { email: 'student1@gmail.com' } as Student,
       { email: 'student2@gmail.com' } as Student,
     ];
-
     const teacher2Students: Student[] = [
       { email: 'student2@gmail.com' } as Student,
       { email: 'student3@gmail.com' } as Student,
     ];
 
     mockFindTeachersWithStudent.mockResolvedValue([
-      { students: teacher1Students } as any,
-      { students: teacher2Students } as any,
+      { students: teacher1Students },
+      { students: teacher2Students },
     ]);
 
     const result = await commonStudentsService.getCommonStudents([
@@ -78,14 +89,27 @@ describe('commonStudentsService.getCommonStudents', () => {
     const teacher1Students: Student[] = [
       { email: 'student1@gmail.com' } as Student,
     ];
-
     const teacher2Students: Student[] = [
       { email: 'student2@gmail.com' } as Student,
     ];
 
     mockFindTeachersWithStudent.mockResolvedValue([
-      { students: teacher1Students } as any,
-      { students: teacher2Students } as any,
+      { students: teacher1Students },
+      { students: teacher2Students },
+    ]);
+
+    const result = await commonStudentsService.getCommonStudents([
+      'teacher1@gmail.com',
+      'teacher2@gmail.com',
+    ]);
+
+    expect(result).toEqual([]);
+  });
+
+  it('should handle undefined students gracefully', async () => {
+    mockFindTeachersWithStudent.mockResolvedValue([
+      { students: undefined },
+      { students: [{ email: 'student1@gmail.com' }] },
     ]);
 
     const result = await commonStudentsService.getCommonStudents([
