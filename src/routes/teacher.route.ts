@@ -1,8 +1,5 @@
 import express from 'express';
-import registerController from '../controllers/register.controller';
-import commonStudentsController from '../controllers/commonStudents.controller';
-import suspendController from '../controllers/suspend.controller';
-import retrieveForNotiController from '../controllers/retrieveForNoti.controller';
+import teacherController from '../controllers/teacher.controller';
 import { normalizeEmails } from '../middlewares/normalizeEmails';
 
 const route = express.Router();
@@ -34,7 +31,7 @@ const route = express.Router();
 route.post(
   '/register',
   normalizeEmails(['teacher', 'students']),
-  registerController.registerStudents
+  teacherController.registerStudents
 );
 
 /**
@@ -69,7 +66,7 @@ route.post(
 route.get(
   '/commonstudents',
   normalizeEmails(['teacher']),
-  commonStudentsController.getCommonStudents
+  teacherController.getCommonStudents
 );
 
 /**
@@ -94,7 +91,7 @@ route.get(
 route.post(
   '/suspend',
   normalizeEmails(['student']),
-  suspendController.suspendStudent
+  teacherController.suspendStudent
 );
 
 /**
@@ -132,7 +129,7 @@ route.post(
 route.post(
   '/retrievefornotifications',
   normalizeEmails(['teacher']),
-  retrieveForNotiController.retrieveForNotifications
+  teacherController.retrieveForNotifications
 );
 
 export default route;
