@@ -41,7 +41,7 @@ describe('registerController.registerStudents', () => {
   });
 
   it('should call service and return 204 on success', async () => {
-    (registerService.registerStudentstoTeacher as jest.Mock).mockResolvedValue(
+    (registerService.registerStudentsToTeacher as jest.Mock).mockResolvedValue(
       true
     );
 
@@ -52,7 +52,7 @@ describe('registerController.registerStudents', () => {
 
     await registerController.registerStudents(req as Request, res as Response);
 
-    expect(registerService.registerStudentstoTeacher).toHaveBeenCalledWith(
+    expect(registerService.registerStudentsToTeacher).toHaveBeenCalledWith(
       'teacher@gmail.com',
       ['student1@gmail.com', 'student2@gmail.com']
     );
@@ -60,7 +60,7 @@ describe('registerController.registerStudents', () => {
   });
 
   it('should return 404 if service throws not found error', async () => {
-    (registerService.registerStudentstoTeacher as jest.Mock).mockRejectedValue(
+    (registerService.registerStudentsToTeacher as jest.Mock).mockRejectedValue(
       new Error('Teacher with email "teacher@gmail.com" not found')
     );
 
@@ -78,7 +78,7 @@ describe('registerController.registerStudents', () => {
   });
 
   it('should return 500 if service throws other error', async () => {
-    (registerService.registerStudentstoTeacher as jest.Mock).mockRejectedValue(
+    (registerService.registerStudentsToTeacher as jest.Mock).mockRejectedValue(
       new Error('DB connection failed')
     );
 

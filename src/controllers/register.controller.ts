@@ -12,7 +12,7 @@ const registerStudents = async (req: Request, res: Response) => {
         .json({ message: 'teacher and students are required' });
     }
 
-    await registerService.registerStudentstoTeacher(teacher, students);
+    await registerService.registerStudentsToTeacher(teacher, students);
 
     return res.sendStatus(HTTP_STATUS.NO_CONTENT);
   } catch (err: unknown) {
@@ -24,7 +24,7 @@ const registerStudents = async (req: Request, res: Response) => {
 
       return res
         .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-        .json({ message: 'Failed to register students' });
+        .json({ message: err.message ?? 'Failed to register students' });
     }
 
     console.error('Unexpected error in registerStudents:', err);

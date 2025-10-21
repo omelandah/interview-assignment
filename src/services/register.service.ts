@@ -3,7 +3,7 @@ import studentRepository from '../repositories/student.repository';
 import { Teacher } from '../database/models/Teacher';
 import { Student } from '../database/models/Student';
 
-const registerStudentstoTeacher = async (
+const registerStudentsToTeacher = async (
   teacherEmail: string,
   studentEmails: string[]
 ): Promise<boolean> => {
@@ -15,6 +15,13 @@ const registerStudentstoTeacher = async (
   const students = await studentRepository.findStudentByEmails(studentEmails);
   if (students.length !== studentEmails.length) {
     throw new Error('One or more students not found');
+  }
+
+  // Check for suspended students
+  const suspendedStudents = students.filter((s) => s.isSuspended);
+  if (suspendedStudents.length > 0) {
+    const suspendedEmails = suspendedStudents.map((s) => s.email).join(', ');
+    throw new Error(`Cannot register suspended students: ${suspendedEmails}`);
   }
 
   const existingStudents = await (teacher as Teacher).getStudents({
@@ -39,5 +46,5 @@ const registerStudentstoTeacher = async (
 };
 
 export default {
-  registerStudentstoTeacher,
+  registerStudentsToTeacher,
 };

@@ -7,15 +7,15 @@ import { Student } from '../../src/database/models/Student';
 jest.mock('../../src/repositories/teacher.repository');
 jest.mock('../../src/repositories/student.repository');
 
-describe('registerStudentstoTeacher', () => {
+describe('registerStudentsToTeacher', () => {
   const mockTeacher = {
     addStudents: jest.fn(),
     getStudents: jest.fn(),
   } as unknown as Teacher;
 
   const mockStudents: Student[] = [
-    { email: 'student1@test.com' } as Student,
-    { email: 'student2@test.com' } as Student,
+    { email: 'student1@test.com', isSuspended: false } as Student,
+    { email: 'student2@test.com', isSuspended: false } as Student,
   ];
 
   beforeEach(() => {
@@ -26,7 +26,7 @@ describe('registerStudentstoTeacher', () => {
     (teacherRepository.findTeacherByEmail as jest.Mock).mockResolvedValue(null);
 
     await expect(
-      registerService.registerStudentstoTeacher('notfound@test.com', [
+      registerService.registerStudentsToTeacher('notfound@test.com', [
         'student1@test.com',
       ])
     ).rejects.toThrow('Teacher with email "notfound@test.com" not found');
@@ -41,11 +41,32 @@ describe('registerStudentstoTeacher', () => {
     ]); // only 1 student returned
 
     await expect(
-      registerService.registerStudentstoTeacher('teacher@test.com', [
+      registerService.registerStudentsToTeacher('teacher@test.com', [
         'student1@test.com',
         'student2@test.com',
       ])
     ).rejects.toThrow('One or more students not found');
+  });
+
+  it('should throw error if any student is suspended', async () => {
+    const suspendedStudents: Student[] = [
+      { email: 'student1@test.com', isSuspended: true } as Student,
+      { email: 'student2@test.com', isSuspended: false } as Student,
+    ];
+
+    (teacherRepository.findTeacherByEmail as jest.Mock).mockResolvedValue(
+      mockTeacher
+    );
+    (studentRepository.findStudentByEmails as jest.Mock).mockResolvedValue(
+      suspendedStudents
+    );
+
+    await expect(
+      registerService.registerStudentsToTeacher('teacher@test.com', [
+        'student1@test.com',
+        'student2@test.com',
+      ])
+    ).rejects.toThrow('Cannot register suspended students: student1@test.com');
   });
 
   it('should throw error if all students are already registered', async () => {
@@ -60,7 +81,7 @@ describe('registerStudentstoTeacher', () => {
     (mockTeacher.getStudents as jest.Mock).mockResolvedValue(mockStudents);
 
     await expect(
-      registerService.registerStudentstoTeacher('teacher@test.com', [
+      registerService.registerStudentsToTeacher('teacher@test.com', [
         'student1@test.com',
         'student2@test.com',
       ])
@@ -80,7 +101,7 @@ describe('registerStudentstoTeacher', () => {
     // only student1 already registered
     (mockTeacher.getStudents as jest.Mock).mockResolvedValue([mockStudents[0]]);
 
-    const result = await registerService.registerStudentstoTeacher(
+    const result = await registerService.registerStudentsToTeacher(
       'teacher@test.com',
       ['student1@test.com', 'student2@test.com']
     );
@@ -100,7 +121,7 @@ describe('registerStudentstoTeacher', () => {
     // no students registered yet
     (mockTeacher.getStudents as jest.Mock).mockResolvedValue([]);
 
-    const result = await registerService.registerStudentstoTeacher(
+    const result = await registerService.registerStudentsToTeacher(
       'teacher@test.com',
       ['student1@test.com', 'student2@test.com']
     );
