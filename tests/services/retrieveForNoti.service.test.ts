@@ -3,8 +3,9 @@ import teacherRepository from '../../src/repositories/teacher.repository';
 import studentTeacherRepository from '../../src/repositories/studentTeacher.repository';
 import studentRepository from '../../src/repositories/student.repository';
 import { Student } from '../../src/database/models/Student';
+import * as emailUtils from '../../src/utils/common';
 
-// Mock repositories
+// Mock repositories and utils
 jest.mock('../../src/repositories/teacher.repository', () => ({
   findTeacherByEmail: jest.fn(),
 }));
@@ -17,6 +18,10 @@ jest.mock('../../src/repositories/student.repository', () => ({
   findNotSuspendedStudentByEmails: jest.fn(),
 }));
 
+jest.mock('../../src/utils/common', () => ({
+  getMentionedEmails: jest.fn(),
+}));
+
 describe('notificationService.getRecipients', () => {
   const mockFindTeacherByEmail =
     teacherRepository.findTeacherByEmail as jest.Mock;
@@ -24,6 +29,7 @@ describe('notificationService.getRecipients', () => {
     studentTeacherRepository.findStudentsByTeacher as jest.Mock;
   const mockFindNotSuspendedStudentByEmails =
     studentRepository.findNotSuspendedStudentByEmails as jest.Mock;
+  const mockGetMentionedEmails = emailUtils.getMentionedEmails as jest.Mock;
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -47,6 +53,7 @@ describe('notificationService.getRecipients', () => {
       { student: null }, // invalid → filtered out
     ]);
 
+    mockGetMentionedEmails.mockReturnValue([]); // no mentions
     mockFindNotSuspendedStudentByEmails.mockResolvedValue([]);
 
     const recipients = await notificationService.getRecipients(
@@ -54,6 +61,10 @@ describe('notificationService.getRecipients', () => {
       'Announcement: class tomorrow!'
     );
 
+    expect(mockFindTeacherByEmail).toHaveBeenCalledWith('teacher1@gmail.com');
+    expect(mockGetMentionedEmails).toHaveBeenCalledWith(
+      'announcement: class tomorrow!'
+    );
     expect(recipients).toEqual(['student1@gmail.com']);
   });
 
@@ -65,6 +76,7 @@ describe('notificationService.getRecipients', () => {
       { student: { email: 'student1@gmail.com', isSuspended: false } },
     ]);
 
+    mockGetMentionedEmails.mockReturnValue(['@student3@gmail.com']);
     mockFindNotSuspendedStudentByEmails.mockResolvedValue([
       { email: 'student3@gmail.com' } as Student,
     ]);
@@ -74,6 +86,9 @@ describe('notificationService.getRecipients', () => {
       'Reminder: project due! @student3@gmail.com'
     );
 
+    expect(mockGetMentionedEmails).toHaveBeenCalledWith(
+      'reminder: project due! @student3@gmail.com'
+    );
     expect(recipients.sort()).toEqual([
       'student1@gmail.com',
       'student3@gmail.com',
@@ -88,6 +103,7 @@ describe('notificationService.getRecipients', () => {
       { student: { email: 'student1@gmail.com', isSuspended: false } },
     ]);
 
+    mockGetMentionedEmails.mockReturnValue(['@student1@gmail.com']);
     mockFindNotSuspendedStudentByEmails.mockResolvedValue([
       { email: 'student1@gmail.com' } as Student, // duplicate
     ]);
@@ -97,7 +113,28 @@ describe('notificationService.getRecipients', () => {
       'Ping @student1@gmail.com'
     );
 
-    // Should not duplicate student1
+    expect(mockGetMentionedEmails).toHaveBeenCalledWith(
+      'ping @student1@gmail.com'
+    );
     expect(recipients).toEqual(['student1@gmail.com']);
+  });
+
+  it('should return empty array if all students suspended or invalid', async () => {
+    const mockTeacher = { id: 't1', email: 'teacher1@gmail.com' };
+    mockFindTeacherByEmail.mockResolvedValue(mockTeacher);
+
+    mockFindStudentsByTeacher.mockResolvedValue([
+      { student: { email: 'student1@gmail.com', isSuspended: true } },
+    ]);
+
+    mockGetMentionedEmails.mockReturnValue(['@student2@gmail.com']);
+    mockFindNotSuspendedStudentByEmails.mockResolvedValue([]); // all mentioned suspended or not found
+
+    const recipients = await notificationService.getRecipients(
+      'teacher1@gmail.com',
+      'Hi @student2@gmail.com'
+    );
+
+    expect(recipients).toEqual([]);
   });
 });

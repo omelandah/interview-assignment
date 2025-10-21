@@ -1,6 +1,7 @@
 import studentTeacherRepository from '../repositories/studentTeacher.repository';
 import teacherRepository from '../repositories/teacher.repository';
 import studentRepository from '../repositories/student.repository';
+import { getMentionedEmails } from '../utils/common';
 
 const getRecipients = async (
   teacherEmail: string,
@@ -21,12 +22,7 @@ const getRecipients = async (
 
   // Extract mentioned emails from notification
   const normalizedNotification = notification.toLowerCase().trim();
-  const mentionRegex = /@([\w.+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
-  const mentionedEmails: string[] = [];
-  let match;
-  while ((match = mentionRegex.exec(normalizedNotification)) !== null) {
-    mentionedEmails.push(match[1]);
-  }
+  const mentionedEmails: string[] = getMentionedEmails(normalizedNotification);
 
   // Validate mentioned students exist & not suspended
   const mentionedStudents =
