@@ -6,6 +6,10 @@ const suspendStudent = async (email: string): Promise<void> => {
     throw new Error(`Student with email ${email} not found`);
   }
 
+  if (student.isSuspended) {
+    return;
+  }
+
   await student.update({ isSuspended: true });
 };
 
