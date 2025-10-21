@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import suspendController from '../../src/controllers/suspend.controller';
 import suspendService from '../../src/services/suspend.service';
+import * as errorHandler from '../../src/utils/errorHandler';
 import { HTTP_STATUS } from '../../src/constants/httpStatus';
 
 jest.mock('../../src/services/suspend.service');
+jest.mock('../../src/utils/errorHandler');
 
 describe('suspendController.suspendStudent', () => {
   let req: Partial<Request>;
@@ -11,8 +13,6 @@ describe('suspendController.suspendStudent', () => {
   let statusMock: jest.Mock;
   let jsonMock: jest.Mock;
   let sendMock: jest.Mock;
-
-  const mockSuspendStudent = suspendService.suspendStudent as jest.Mock;
 
   beforeEach(() => {
     statusMock = jest.fn().mockReturnThis();
@@ -44,23 +44,45 @@ describe('suspendController.suspendStudent', () => {
 
   it('should call service and return 204 on success', async () => {
     req.body = { student: 'student1@gmail.com' };
-    mockSuspendStudent.mockResolvedValue(true);
+    (suspendService.suspendStudent as jest.Mock).mockResolvedValue(true);
 
     await suspendController.suspendStudent(req as Request, res as Response);
 
-    expect(mockSuspendStudent).toHaveBeenCalledWith('student1@gmail.com');
+    expect(suspendService.suspendStudent).toHaveBeenCalledWith(
+      'student1@gmail.com'
+    );
     expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.NO_CONTENT);
     expect(sendMock).toHaveBeenCalled();
   });
 
-  it('should return 500 if service throws an error', async () => {
+  it('should call handleErrorResponse when service throws an error', async () => {
+    const mockError = new Error('DB error');
+    (suspendService.suspendStudent as jest.Mock).mockRejectedValue(mockError);
+
     req.body = { student: 'student1@gmail.com' };
-    mockSuspendStudent.mockRejectedValue(new Error('DB error'));
 
     await suspendController.suspendStudent(req as Request, res as Response);
 
-    expect(mockSuspendStudent).toHaveBeenCalledWith('student1@gmail.com');
-    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(jsonMock).toHaveBeenCalledWith({ message: 'DB error' });
+    expect(errorHandler.handleErrorResponse).toHaveBeenCalledWith(
+      res,
+      mockError,
+      'suspendStudent'
+    );
+  });
+
+  it('should call handleErrorResponse for non-Error thrown types', async () => {
+    (suspendService.suspendStudent as jest.Mock).mockRejectedValue(
+      'random error'
+    );
+
+    req.body = { student: 'student1@gmail.com' };
+
+    await suspendController.suspendStudent(req as Request, res as Response);
+
+    expect(errorHandler.handleErrorResponse).toHaveBeenCalledWith(
+      res,
+      'random error',
+      'suspendStudent'
+    );
   });
 });

@@ -2,8 +2,10 @@ import { Request, Response } from 'express';
 import commonStudentsController from '../../src/controllers/commonStudents.controller';
 import commonStudentsService from '../../src/services/commonStudents.service';
 import { HTTP_STATUS } from '../../src/constants/httpStatus';
+import { handleErrorResponse } from '../../src/utils/errorHandler';
 
 jest.mock('../../src/services/commonStudents.service');
+jest.mock('../../src/utils/errorHandler');
 
 describe('commonStudentsController.getCommonStudents', () => {
   let req: Partial<Request>;
@@ -13,15 +15,13 @@ describe('commonStudentsController.getCommonStudents', () => {
 
   const mockGetCommonStudents =
     commonStudentsService.getCommonStudents as jest.Mock;
+  const mockHandleErrorResponse = handleErrorResponse as jest.Mock;
 
   beforeEach(() => {
     statusMock = jest.fn().mockReturnThis();
     jsonMock = jest.fn().mockReturnThis();
     req = {};
     res = { status: statusMock, json: jsonMock };
-  });
-
-  afterEach(() => {
     jest.clearAllMocks();
   });
 
@@ -74,16 +74,20 @@ describe('commonStudentsController.getCommonStudents', () => {
     });
   });
 
-  it('should return 500 if service throws an error', async () => {
+  it('should call handleErrorResponse when service throws an error', async () => {
     req.query = { teacher: 'teacher1@gmail.com' };
-    mockGetCommonStudents.mockRejectedValue(new Error('DB failure'));
+    const testError = new Error('DB failure');
+    mockGetCommonStudents.mockRejectedValue(testError);
 
     await commonStudentsController.getCommonStudents(
       req as Request,
       res as Response
     );
 
-    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(jsonMock).toHaveBeenCalledWith({ message: 'DB failure' });
+    expect(mockHandleErrorResponse).toHaveBeenCalledWith(
+      res,
+      testError,
+      'getCommonStudents'
+    );
   });
 });

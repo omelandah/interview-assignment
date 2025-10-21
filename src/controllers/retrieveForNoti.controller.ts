@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { HTTP_STATUS } from '../constants/httpStatus';
 import retrieveForNotiService from '../services/retrieveForNoti.service';
+import { handleErrorResponse } from '../utils/errorHandler';
 
 const retrieveForNotifications = async (req: Request, res: Response) => {
   try {
@@ -19,13 +20,7 @@ const retrieveForNotifications = async (req: Request, res: Response) => {
 
     res.status(HTTP_STATUS.OK).json({ recipients });
   } catch (error) {
-    if (error instanceof Error && error.message === 'Teacher not found') {
-      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: error.message });
-    }
-    console.error('Error in retrieveForNotifications:', error);
-    return res
-      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ message: 'Internal server error' });
+    return handleErrorResponse(res, error, 'retrieveForNotifications');
   }
 };
 

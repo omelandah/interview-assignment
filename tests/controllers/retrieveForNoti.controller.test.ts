@@ -2,8 +2,10 @@ import { Request, Response } from 'express';
 import retrieveForNotiController from '../../src/controllers/retrieveForNoti.controller';
 import retrieveForNotiService from '../../src/services/retrieveForNoti.service';
 import { HTTP_STATUS } from '../../src/constants/httpStatus';
+import * as errorHandler from '../../src/utils/errorHandler';
 
 jest.mock('../../src/services/retrieveForNoti.service');
+jest.mock('../../src/utils/errorHandler');
 
 describe('retrieveForNotiController.retrieveForNotifications', () => {
   let req: Partial<Request>;
@@ -11,11 +13,10 @@ describe('retrieveForNotiController.retrieveForNotifications', () => {
   let statusMock: jest.Mock;
   let jsonMock: jest.Mock;
 
-  const mockGetRecipients = retrieveForNotiService.getRecipients as jest.Mock;
-
   beforeEach(() => {
     statusMock = jest.fn().mockReturnThis();
     jsonMock = jest.fn().mockReturnThis();
+
     req = {};
     res = {
       status: statusMock,
@@ -42,21 +43,22 @@ describe('retrieveForNotiController.retrieveForNotifications', () => {
   });
 
   it('should return 200 with recipients on success', async () => {
+    (retrieveForNotiService.getRecipients as jest.Mock).mockResolvedValue([
+      'student1@gmail.com',
+      'student2@gmail.com',
+    ]);
+
     req.body = {
       teacher: 'teacher@gmail.com',
       notification: 'Hello @student1@gmail.com',
     };
-    mockGetRecipients.mockResolvedValue([
-      'student1@gmail.com',
-      'student2@gmail.com',
-    ]);
 
     await retrieveForNotiController.retrieveForNotifications(
       req as Request,
       res as Response
     );
 
-    expect(mockGetRecipients).toHaveBeenCalledWith(
+    expect(retrieveForNotiService.getRecipients).toHaveBeenCalledWith(
       'teacher@gmail.com',
       'Hello @student1@gmail.com'
     );
@@ -66,35 +68,48 @@ describe('retrieveForNotiController.retrieveForNotifications', () => {
     });
   });
 
-  it('should return 404 if teacher not found', async () => {
+  it('should call handleErrorResponse when service throws an error', async () => {
+    const mockError = new Error('DB error');
+    (retrieveForNotiService.getRecipients as jest.Mock).mockRejectedValue(
+      mockError
+    );
+
     req.body = {
       teacher: 'teacher@gmail.com',
       notification: 'Hello students',
     };
-    mockGetRecipients.mockRejectedValue(new Error('Teacher not found'));
 
     await retrieveForNotiController.retrieveForNotifications(
       req as Request,
       res as Response
     );
 
-    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.NOT_FOUND);
-    expect(jsonMock).toHaveBeenCalledWith({ message: 'Teacher not found' });
+    expect(errorHandler.handleErrorResponse).toHaveBeenCalledWith(
+      res,
+      mockError,
+      'retrieveForNotifications'
+    );
   });
 
-  it('should return 500 for other service errors', async () => {
+  it('should call handleErrorResponse for non-Error thrown types', async () => {
+    (retrieveForNotiService.getRecipients as jest.Mock).mockRejectedValue(
+      'random error'
+    );
+
     req.body = {
       teacher: 'teacher@gmail.com',
       notification: 'Hello students',
     };
-    mockGetRecipients.mockRejectedValue(new Error('DB error'));
 
     await retrieveForNotiController.retrieveForNotifications(
       req as Request,
       res as Response
     );
 
-    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(jsonMock).toHaveBeenCalledWith({ message: 'Internal server error' });
+    expect(errorHandler.handleErrorResponse).toHaveBeenCalledWith(
+      res,
+      'random error',
+      'retrieveForNotifications'
+    );
   });
 });

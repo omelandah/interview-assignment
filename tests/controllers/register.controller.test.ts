@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
+import { HTTP_STATUS } from '../../src/constants/httpStatus';
 import registerController from '../../src/controllers/register.controller';
 import registerService from '../../src/services/register.service';
-import { HTTP_STATUS } from '../../src/constants/httpStatus';
+import * as errorHandler from '../../src/utils/errorHandler';
 
-// Mock the service
 jest.mock('../../src/services/register.service');
+jest.mock('../../src/utils/errorHandler');
 
 describe('registerController.registerStudents', () => {
   let req: Partial<Request>;
@@ -60,9 +61,10 @@ describe('registerController.registerStudents', () => {
     expect(sendStatusMock).toHaveBeenCalledWith(HTTP_STATUS.NO_CONTENT);
   });
 
-  it('should return 404 if service throws a "not found" error', async () => {
+  it('should delegate error handling to handleErrorResponse when service throws', async () => {
+    const mockError = new Error('DB connection failed');
     (registerService.registerStudentsToTeacher as jest.Mock).mockRejectedValue(
-      new Error('Teacher with email "teacher@gmail.com" not found')
+      mockError
     );
 
     req.body = {
@@ -72,15 +74,16 @@ describe('registerController.registerStudents', () => {
 
     await registerController.registerStudents(req as Request, res as Response);
 
-    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.NOT_FOUND);
-    expect(jsonMock).toHaveBeenCalledWith({
-      message: 'Teacher with email "teacher@gmail.com" not found',
-    });
+    expect(errorHandler.handleErrorResponse).toHaveBeenCalledWith(
+      res,
+      mockError,
+      'registerStudents'
+    );
   });
 
-  it('should return 500 with err.message when service throws other error', async () => {
+  it('should handle unexpected non-Error types', async () => {
     (registerService.registerStudentsToTeacher as jest.Mock).mockRejectedValue(
-      new Error('DB connection failed')
+      'some string'
     );
 
     req.body = {
@@ -90,50 +93,10 @@ describe('registerController.registerStudents', () => {
 
     await registerController.registerStudents(req as Request, res as Response);
 
-    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(jsonMock).toHaveBeenCalledWith({
-      message: 'DB connection failed',
-    });
-  });
-
-  it('should return 500 with default message when err.message is undefined', async () => {
-    const err = new Error();
-    // @ts-ignore
-    delete err.message;
-
-    (registerService.registerStudentsToTeacher as jest.Mock).mockRejectedValue(
-      err
+    expect(errorHandler.handleErrorResponse).toHaveBeenCalledWith(
+      res,
+      'some string',
+      'registerStudents'
     );
-
-    req.body = {
-      teacher: 'teacher@gmail.com',
-      students: ['student1@gmail.com'],
-    };
-
-    await registerController.registerStudents(req as Request, res as Response);
-
-    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(jsonMock).toHaveBeenCalledWith({
-      message: 'Failed to register students',
-    });
-  });
-
-  it('should return 500 for unexpected non-Error type', async () => {
-    // @ts-ignore simulate throwing a random string
-    (registerService.registerStudentsToTeacher as jest.Mock).mockRejectedValue(
-      'Some random string'
-    );
-
-    req.body = {
-      teacher: 'teacher@gmail.com',
-      students: ['student1@gmail.com'],
-    };
-
-    await registerController.registerStudents(req as Request, res as Response);
-
-    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(jsonMock).toHaveBeenCalledWith({
-      message: 'Unexpected error',
-    });
   });
 });
