@@ -2,7 +2,9 @@ import teacherRepository from '../repositories/teacher.repository';
 import { Student } from '../database/models/Student';
 import { Teacher } from '../database/models/Teacher';
 
-const getCommonStudents = async (teacherEmails: string[]) => {
+const getCommonStudents = async (
+  teacherEmails: string[]
+): Promise<string[]> => {
   const teachers =
     await teacherRepository.findTeachersWithStudent(teacherEmails);
 

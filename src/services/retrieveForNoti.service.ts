@@ -2,7 +2,10 @@ import studentTeacherRepository from '../repositories/studentTeacher.repository'
 import teacherRepository from '../repositories/teacher.repository';
 import studentRepository from '../repositories/student.repository';
 
-const getRecipients = async (teacherEmail: string, notification: string) => {
+const getRecipients = async (
+  teacherEmail: string,
+  notification: string
+): Promise<string[]> => {
   const teacher = await teacherRepository.findTeacherByEmail(teacherEmail);
 
   if (!teacher) {
@@ -14,8 +17,7 @@ const getRecipients = async (teacherEmail: string, notification: string) => {
     await studentTeacherRepository.findStudentsByTeacher(teacher.id);
   const registeredStudentEmails = registeredStudents
     .filter((rel) => rel.student && !rel.student.isSuspended)
-    .map((rel) => rel.student?.email)
-    .filter(Boolean);
+    .map((rel) => rel.student!.email);
 
   // Extract mentioned emails from notification
   const normalizedNotification = notification.toLowerCase().trim();
@@ -29,13 +31,15 @@ const getRecipients = async (teacherEmail: string, notification: string) => {
   // Validate mentioned students exist & not suspended
   const mentionedStudents =
     await studentRepository.findNotSuspendedStudentByEmails(mentionedEmails);
-  const mentionStudentsEmails = mentionedStudents.map(
+  const mentionedStudentEmails = mentionedStudents.map(
     (student) => student.email
   );
+  const allRecipients = new Set([
+    ...registeredStudentEmails,
+    ...mentionedStudentEmails,
+  ]);
 
-  return Array.from(
-    new Set([...registeredStudentEmails, ...mentionStudentsEmails])
-  );
+  return Array.from(allRecipients);
 };
 
 export default {

@@ -3,18 +3,20 @@ import { Student } from '../database/models/Student';
 
 const StudentModel = sequelize.models.Student as typeof Student;
 
-const findStudentByEmails = async (emails: string[]) => {
-  return await StudentModel.findAll({ where: { email: emails } });
+const findStudentByEmails = (emails: string[]): Promise<Student[]> => {
+  return StudentModel.findAll({ where: { email: emails } });
 };
 
-const findNotSuspendedStudentByEmails = async (emails: string[]) => {
-  return await StudentModel.findAll({
+const findNotSuspendedStudentByEmails = (
+  emails: string[]
+): Promise<Student[]> => {
+  return StudentModel.findAll({
     where: { email: emails, isSuspended: false },
   });
 };
 
-const findStudentByEmail = async (email: string) => {
-  return await StudentModel.findOne({ where: { email } });
+const findStudentByEmail = (email: string): Promise<Student | null> => {
+  return StudentModel.findOne({ where: { email } });
 };
 
 export default {

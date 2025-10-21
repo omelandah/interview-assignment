@@ -4,12 +4,14 @@ import { Teacher } from '../database/models/Teacher';
 
 const TeacherModel = sequelize.models.Teacher as typeof Teacher;
 
-const findTeacherByEmail = async (email: string) => {
-  return await TeacherModel.findOne({ where: { email } });
+const findTeacherByEmail = (email: string): Promise<Teacher | null> => {
+  return TeacherModel.findOne({ where: { email } });
 };
 
-const findTeachersWithStudent = async (emails: string[]) => {
-  return await TeacherModel.findAll({
+const findTeachersWithStudent = (
+  emails: string[]
+): Promise<(Teacher & { students?: Student[] })[]> => {
+  return TeacherModel.findAll({
     where: { email: emails },
     include: [
       {

@@ -6,7 +6,7 @@ import { Student } from '../database/models/Student';
 const registerStudentstoTeacher = async (
   teacherEmail: string,
   studentEmails: string[]
-) => {
+): Promise<boolean> => {
   const teacher = await teacherRepository.findTeacherByEmail(teacherEmail);
   if (!teacher) {
     throw new Error(`Teacher with email "${teacherEmail}" not found`);

@@ -5,8 +5,10 @@ import { StudentTeacher } from '../database/models/StudentTeacher';
 const StudentTeacherModel = sequelize.models
   .StudentTeacher as typeof StudentTeacher;
 
-const findStudentsByTeacher = async (teacherId: string) => {
-  const registeredStudents = await StudentTeacherModel.findAll({
+const findStudentsByTeacher = (
+  teacherId: string
+): Promise<(StudentTeacher & { student?: Student })[]> => {
+  const registeredStudents = StudentTeacherModel.findAll({
     where: { teacherId },
     include: {
       model: Student,
