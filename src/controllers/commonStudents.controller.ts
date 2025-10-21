@@ -1,12 +1,15 @@
 import commonStudentsService from '../services/commonStudents.service';
 import { Request, Response } from 'express';
+import { HTTP_STATUS } from '../constants/httpStatus';
 
 const getCommonStudents = async (req: Request, res: Response) => {
   try {
     const teacherEmails = req.query.teacher;
 
     if (!teacherEmails) {
-      return res.status(400).json({ message: 'Teacher email is required' });
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ message: 'Teacher email is required' });
     }
     const emailList = Array.isArray(teacherEmails)
       ? teacherEmails
@@ -16,13 +19,17 @@ const getCommonStudents = async (req: Request, res: Response) => {
       emailList as string[]
     );
 
-    return res.status(200).json({ students: commonStudents });
+    return res.status(HTTP_STATUS.OK).json({ students: commonStudents });
   } catch (err: unknown) {
     console.log('Error in getCommonStudents:', err);
     if (err instanceof Error) {
-      return res.status(500).json({ message: err.message });
+      return res
+        .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+        .json({ message: err.message });
     }
-    return res.status(500).json({ message: 'Internal Server Error' });
+    return res
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: 'Internal Server Error' });
   }
 };
 
