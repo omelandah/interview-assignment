@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import suspendController from '../../src/controllers/suspend.controller';
 import suspendService from '../../src/services/suspend.service';
+import { HTTP_STATUS } from '../../src/constants/httpStatus';
 
 jest.mock('../../src/services/suspend.service');
 
@@ -35,7 +36,7 @@ describe('suspendController.suspendStudent', () => {
 
     await suspendController.suspendStudent(req as Request, res as Response);
 
-    expect(statusMock).toHaveBeenCalledWith(400);
+    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
     expect(jsonMock).toHaveBeenCalledWith({
       message: 'Student email is required',
     });
@@ -48,7 +49,7 @@ describe('suspendController.suspendStudent', () => {
     await suspendController.suspendStudent(req as Request, res as Response);
 
     expect(mockSuspendStudent).toHaveBeenCalledWith('student1@gmail.com');
-    expect(statusMock).toHaveBeenCalledWith(204);
+    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.NO_CONTENT);
     expect(sendMock).toHaveBeenCalled();
   });
 
@@ -59,7 +60,7 @@ describe('suspendController.suspendStudent', () => {
     await suspendController.suspendStudent(req as Request, res as Response);
 
     expect(mockSuspendStudent).toHaveBeenCalledWith('student1@gmail.com');
-    expect(statusMock).toHaveBeenCalledWith(500);
+    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(jsonMock).toHaveBeenCalledWith({ message: 'DB error' });
   });
 });

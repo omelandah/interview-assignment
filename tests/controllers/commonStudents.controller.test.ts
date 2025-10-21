@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import commonStudentsController from '../../src/controllers/commonStudents.controller';
 import commonStudentsService from '../../src/services/commonStudents.service';
+import { HTTP_STATUS } from '../../src/constants/httpStatus';
 
 jest.mock('../../src/services/commonStudents.service');
 
@@ -32,7 +33,7 @@ describe('commonStudentsController.getCommonStudents', () => {
       res as Response
     );
 
-    expect(statusMock).toHaveBeenCalledWith(400);
+    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
     expect(jsonMock).toHaveBeenCalledWith({
       message: 'Teacher email is required',
     });
@@ -48,7 +49,7 @@ describe('commonStudentsController.getCommonStudents', () => {
     );
 
     expect(mockGetCommonStudents).toHaveBeenCalledWith(['teacher1@gmail.com']);
-    expect(statusMock).toHaveBeenCalledWith(200);
+    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.OK);
     expect(jsonMock).toHaveBeenCalledWith({
       students: ['student1@gmail.com'],
     });
@@ -67,7 +68,7 @@ describe('commonStudentsController.getCommonStudents', () => {
       'teacher1@gmail.com',
       'teacher2@gmail.com',
     ]);
-    expect(statusMock).toHaveBeenCalledWith(200);
+    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.OK);
     expect(jsonMock).toHaveBeenCalledWith({
       students: ['commonstudent@gmail.com'],
     });
@@ -82,7 +83,7 @@ describe('commonStudentsController.getCommonStudents', () => {
       res as Response
     );
 
-    expect(statusMock).toHaveBeenCalledWith(500);
+    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(jsonMock).toHaveBeenCalledWith({ message: 'DB failure' });
   });
 });

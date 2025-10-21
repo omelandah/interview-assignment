@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import retrieveForNotiController from '../../src/controllers/retrieveForNoti.controller';
 import retrieveForNotiService from '../../src/services/retrieveForNoti.service';
+import { HTTP_STATUS } from '../../src/constants/httpStatus';
 
 jest.mock('../../src/services/retrieveForNoti.service');
 
@@ -34,7 +35,7 @@ describe('retrieveForNotiController.retrieveForNotifications', () => {
       res as Response
     );
 
-    expect(statusMock).toHaveBeenCalledWith(400);
+    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
     expect(jsonMock).toHaveBeenCalledWith({
       message: 'Teacher and notification are required.',
     });
@@ -59,7 +60,7 @@ describe('retrieveForNotiController.retrieveForNotifications', () => {
       'teacher@gmail.com',
       'Hello @student1@gmail.com'
     );
-    expect(statusMock).toHaveBeenCalledWith(200);
+    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.OK);
     expect(jsonMock).toHaveBeenCalledWith({
       recipients: ['student1@gmail.com', 'student2@gmail.com'],
     });
@@ -77,7 +78,7 @@ describe('retrieveForNotiController.retrieveForNotifications', () => {
       res as Response
     );
 
-    expect(statusMock).toHaveBeenCalledWith(404);
+    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.NOT_FOUND);
     expect(jsonMock).toHaveBeenCalledWith({ message: 'Teacher not found' });
   });
 
@@ -93,7 +94,7 @@ describe('retrieveForNotiController.retrieveForNotifications', () => {
       res as Response
     );
 
-    expect(statusMock).toHaveBeenCalledWith(500);
+    expect(statusMock).toHaveBeenCalledWith(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(jsonMock).toHaveBeenCalledWith({ message: 'Internal server error' });
   });
 });
