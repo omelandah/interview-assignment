@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"teacher\": \"teacher1@gmail.com\",\n    \"students\": [\"student6@gmail.com\"]\n}",
+					"raw": "{\n    \"teacher\": \"teacher1@gmail.com\",\n    \"students\": [\"student3@gmail.com\"]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -47,7 +47,7 @@
 					"formdata": []
 				},
 				"url": {
-					"raw": "{{host}}:{{port}}/api/commonstudents?teacher=teacher2@gmail.com",
+					"raw": "{{host}}:{{port}}/api/commonstudents?teacher=teacher1@gmail.com&teacher=teacher3@gmail.com",
 					"host": [
 						"{{host}}"
 					],
@@ -59,7 +59,11 @@
 					"query": [
 						{
 							"key": "teacher",
-							"value": "teacher2@gmail.com"
+							"value": "teacher1@gmail.com"
+						},
+						{
+							"key": "teacher",
+							"value": "teacher3@gmail.com"
 						}
 					]
 				}
@@ -76,7 +80,7 @@
 					"urlencoded": [
 						{
 							"key": "student",
-							"value": "studentjon@gmail.com",
+							"value": "studentJoN@gmail.com",
 							"type": "text"
 						}
 					]

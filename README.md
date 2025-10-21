@@ -41,7 +41,7 @@ _No setup is required — simply open the link above to try the live API!_
 
 ### Postman Collection
 
-To conveniently test the API in both local and production, the project includes a **Postman collection** file named `student management api.postman_collection.json`.
+To conveniently test the API in both local and production, the project includes a **Postman collection** file named `student-management-api.postman_collection.json`.
 
 You can use this file to:
 
@@ -51,7 +51,7 @@ You can use this file to:
 ### How to Use the Postman Collection:
 
 1. Open Postman.
-2. Click on **Import** and select the `student management api.postman_collection.json` file from the project directory.
+2. Click on **Import** and select the `student-management-api.postman_collection.json` file from the project directory.
 3. The included environment variables for **local** environments will automatically be imported.
 4. Start testing the endpoints with the pre-configured requests!
 
