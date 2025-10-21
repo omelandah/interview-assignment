@@ -5,9 +5,9 @@ import { StudentTeacher } from '../database/models/StudentTeacher';
 const StudentTeacherModel = sequelize.models
   .StudentTeacher as typeof StudentTeacher;
 
-const findStudentsByTeacher = async (teacherUuid: string) => {
+const findStudentsByTeacher = async (teacherId: string) => {
   const registeredStudents = await StudentTeacherModel.findAll({
-    where: { teacherUuid },
+    where: { teacherId },
     include: {
       model: Student,
       as: 'student',

@@ -3,9 +3,10 @@ import { QueryInterface, DataTypes } from 'sequelize';
 export const up = async (queryInterface: QueryInterface) => {
   await queryInterface.createTable('t_student_teacher', {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+      allowNull: false,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     student_uuid: {
       type: DataTypes.UUID,

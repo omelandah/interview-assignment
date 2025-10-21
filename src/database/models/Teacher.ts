@@ -65,8 +65,8 @@ const TeacherModel: ModelDefinition = {
   associate: (models) => {
     Teacher.belongsToMany(models.Student, {
       through: models.StudentTeacher,
-      foreignKey: 'teacherUuid',
-      otherKey: 'studentUuid',
+      foreignKey: 'teacherId',
+      otherKey: 'studentId',
       as: 'students',
       onDelete: 'CASCADE',
     });

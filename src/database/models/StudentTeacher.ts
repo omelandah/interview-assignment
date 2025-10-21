@@ -4,7 +4,7 @@ import { Student } from './Student';
 import { Teacher } from './Teacher';
 
 export class StudentTeacher extends Model {
-  declare id: number;
+  declare id: string;
   declare studentId: string;
   declare teacherId: string;
 
@@ -23,11 +23,12 @@ const StudentTeacherModel: ModelDefinition = {
     StudentTeacher.init(
       {
         id: {
-          type: DataTypes.INTEGER,
+          type: DataTypes.UUID,
+          defaultValue: DataTypes.UUIDV4,
           primaryKey: true,
-          autoIncrement: true,
+          allowNull: false,
         },
-        studentUuid: {
+        studentId: {
           type: DataTypes.UUID,
           allowNull: false,
           references: {
@@ -38,7 +39,7 @@ const StudentTeacherModel: ModelDefinition = {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE',
         },
-        teacherUuid: {
+        teacherId: {
           type: DataTypes.UUID,
           allowNull: false,
           references: {
@@ -69,12 +70,12 @@ const StudentTeacherModel: ModelDefinition = {
 
   associate: (models) => {
     StudentTeacher.belongsTo(models.Student, {
-      foreignKey: 'studentUuid',
+      foreignKey: 'studentId',
       as: 'student',
       onDelete: 'CASCADE',
     });
     StudentTeacher.belongsTo(models.Teacher, {
-      foreignKey: 'teacherUuid',
+      foreignKey: 'teacherId',
       as: 'teacher',
       onDelete: 'CASCADE',
     });

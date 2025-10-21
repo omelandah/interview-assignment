@@ -17,10 +17,12 @@ module.exports = {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     dialect: 'mysql',
-    dialectOptions: {
-      ssl: {
-        ca: fs.readFileSync(process.env.DB_SSL_CA),
-      },
-    },
+    dialectOptions: process.env.DB_SSL_CA
+      ? {
+          ssl: {
+            ca: fs.readFileSync(process.env.DB_SSL_CA),
+          },
+        }
+      : {},
   },
 };
